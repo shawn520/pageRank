@@ -299,7 +299,81 @@ The main difference between GD and SGD is that GD updates all the p u and p v on
 
 GD和SGD之间的主要区别在于，GD每次迭代更新所有的p和p，而不是像SGD中那样每次更新一次。
 
+### 3.4 Triangle Counting (TC) 三角计数
 
+ This is a statistics algorithm useful for understanding social networks, graph analysis and computing clustering coefficient. 
+
+这是一个统计算法，用于理解社交网络，图形分析和计算聚类系数。
+
+The algorithm computes the number of triangles in a given graph. 
+
+该算法计算给定图形中的三角形数量。
+
+A triangle exists when a vertex has two adjacent vertices that are also adjacent to each other. 
+
+当一个顶点有两个相邻的顶点时，三角形也存在。
+
+The technique used to compute the number of triangles is as follows. 
+
+用于计算三角形数量的技术如下。
+
+Each vertex shares its neighbor list with each of its neighbors. 
+
+每个顶点与其每个顶点共享其相邻列表。
+
+Each vertex then computes the intersection between its neighbor list and the neighbor list(s) it receives. 
+
+然后每个顶点计算其邻居列表与其接收到的邻居列表之间的交集。
+
+For a given directed graph with no cycles, the size of the intersections gives the number of triangles in the graph.
+
+对于没有周期的给定有向图，交点的大小给出了图中三角形的数量。
+
+When the graph is undirected, then each vertex in a triangle contributes to the count, hence the size of the intersection is exactly 3 times the number of triangles. 
+
+当图形是无向的，那么三角形中的每个顶点都有助于计数，因此交点的大小恰好是三角形数量的3倍。
+
+The problem can be expressed mathematically as follows, where E uv denotes the presence of an (undirected) edge between vertex u and vertex v.
+
+该问题可以用数学表达如下，其中E uv表示顶点u和顶点v之间存在（无向）边。
+
+#### 3.5. Single Source Shortest Path (SSSP) 单源最短路径
+
+This is another graph algorithm used to compute the shortest paths from a single source to all other vertices in a given weighted and directed graph. 
+
+这是另一种图形算法，用于计算给定加权有向图中从单个源到所有其他顶点的最短路径。
+
+The algorithm is used in many applications such as finding driving directions in maps or computing the min-delay path in telecommunication networks. 
+
+该算法用于许多应用中，例如寻找地图中的驾驶方向或计算电信网络中的最小延迟路径。
+
+Similar to BFS, the algorithm starts with a given vertex (called source) and iteratively explores all the vertices in the graph. 
+
+与BFS类似，算法从给定的顶点（称为源）开始，并迭代地探索图中的所有顶点。
+
+The idea is to assign a distance value to each vertex, which is the minimum edge weights needed to reach a particular vertex from the source. 
+
+这个想法是为每个顶点分配一个距离值，这是从源头到达特定顶点所需的最小边权重。
+
+At each iteration t, each vertex performs the following
+
+在每次迭代t时，每个顶点执行以下操作
+
+Where w(u,v) represents the weight of the edge (u,v). 
+
+w（u，v）代表边的权重（u，v）。
+
+Initially the Distance for each vertex is set to infinity except the source with Distance value set to 0. 
+
+除了距离值设置为0的源之外，最初每个顶点的距离都设置为无穷大。
+
+We use a slight variation on the Bellman-Ford shortest path algorithm where we only update the distance of those vertices that are adjacent to those that changed their distance in the previous iteration.
+
+我们在Bellman-Ford最短路径算法上略有变化，我们只更新那些在前一次迭代中改变其距离的那些顶点的距离。
+
+We now discuss the implementation of GraphMat and its opti-mizations in the next section.
+
+我们现在讨论GraphMat的实现及其优化在下一节中介绍。
 
 ## 4. GRAPHMAT 图矩阵
 
