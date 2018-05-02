@@ -253,6 +253,54 @@ If the update leads to a change in distance (from infinity to t+1),then the vert
 
 如果更新导致距离（从无穷远到t + 1）的变化，则顶点在下一次迭代中变为活动状态。
 
+### 3.3 Collaborative Filtering (CF) 协作过滤算法
+
+This is a machine learning algorithm used by many recommender systems [27] for estimating a user’s rating for a given item based on an incomplete set of (user, item) ratings. 
+
+这是一种由许多推荐系统[27]使用的机器学习算法，用于基于（用户，项目）评分的不完整集合来估计给定项目的用户评分。
+
+The underlying assumption is that users’ ratings are based on a set of hidden/latent features and each item can be expressed as a combination of these features. 
+
+潜在的假设是用户的评分基于一组隐藏/潜在特征，每个项目可以表示为这些特征的组合。
+
+Ratings depend on how well the user’s and item’s features match. 
+
+评分取决于用户和项目的功能匹配程度。
+
+Given a matrix Gof ratings, the goal of collaborative filtering technique is to compute two factors P U and P V , each one is a low-dimensional dense matrix. 
+
+给定一个矩阵Gof评分，协同过滤技术的目标是计算两个因子P U和P V，每个因子是一个低维密集矩阵。
+
+This can be accomplished using incomplete matrix factorization [20]. 
+
+这可以通过使用不完全矩阵分解来实现[20]。
+
+Mathematically, the problem can be expressed as eq. (3) 
+
+在数学上，这个问题可以表示为等式。（3）
+
+where u and v are the indices of the users and items, respectively, G uv is the rating of the u th user for the v th item, p u &p v are dense vectors of length K corresponding to each user and item, respectively.
+
+其中u和v分别是用户和项目的指数，G uv是第v个项目的第u个用户的评分，p u和p v分别是对应于每个用户和项目的长度K的密集向量。
+
+Matrix factorization is usually performed iteratively using Stochastic Gradient Descent (SGD) or Gradient Descent (GD). 
+
+矩阵分解通常使用随机梯度下降（SGD）或梯度下降（GD）迭代执行。
+
+In each iteration t, GD performs Equation 4 - 6 for all users and items. 
+
+在每次迭代t中，GD对所有用户和项目执行公式4-6。
+
+SGD performs the same updates without the summation in equation 5 on all ratings in a random order. 
+
+SGD在没有等式5中的所有评级的总和的情况下以随机顺序执行相同的更新。
+
+The main difference between GD and SGD is that GD updates all the p u and p v once per iteration instead of once per rating as in SGD.
+
+GD和SGD之间的主要区别在于，GD每次迭代更新所有的p和p，而不是像SGD中那样每次更新一次。
+
+
+
 ## 4. GRAPHMAT 图矩阵
 
 ## 5. RESULTS 实验结果
