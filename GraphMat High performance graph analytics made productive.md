@@ -54,3 +54,124 @@ Graph processing has become an important component of bio informatics[17], socia
 With graphs getting larger and queries getting more complex, there is a need for graph analysis frameworks to help users extract the information they need with minimal programming effort.
 
 随着图形越来越大，查询变得越来越复杂，图形分析框架需要帮助用户以最少的编程工作来提取他们所需的信息。
+
+There has been an explosion of graph programming frameworks in recent years [1, 3, 4, 5, 15, 19, 30]. 
+
+近年来图形编程框架发展迅猛[1,3,4,5,15,19,30]。
+
+All of them claim to provide good productivity, performance and scalability. 
+
+他们都声称提供良好的生产力，性能和可扩展性。
+
+However, a recent study has shown [28] that the performance of most frameworks is off by an order of magnitude when compared to native, hand-optimized code. 
+
+然而，最近的一项研究表明[28]，与原生的，手工优化的代码相比，大多数框架的性能都要下降一个数量级。
+
+Given that much of this performance gap remains even when running frameworks on a single node [28], it is imperative to maximize the efficiency of graph frameworks on existing hardware (in addition to focusing on scale out issues). 
+
+考虑到即使在单个节点上运行框架，这种性能差距仍然存在[28]，所以必须最大限度地提高现有硬件上的图形框架的效率（除了侧重于扩展问题外）。
+
+GraphMat is our solution to bridge this performance-productivity gap in graph analytics.
+
+我们的解决方案GraphMat可以弥合图形分析中的性能与生产力差距。
+
+The main idea of GraphMat is to take vertex programs and map them to generalized sparse matrix vector multiplication operations. 
+
+GraphMat的主要思想是获取顶点程序并将它们映射到广义稀疏矩阵向量乘法运算。
+
+We get the productivity benefits of vertex programming while enjoying the high performance of a matrix backend. 
+
+在享受矩阵后端的高性能的同时，我们获得顶点编程的生产力优势。
+
+In addition, it is easy to understand and reason about, while letting users with knowledge of vertex programming a smooth transition to a high performance environment. 
+
+此外，很容易让用户理解和推理顶点编程顺利过渡到高性能环境。
+
+Although other graph frameworks based on matrix operations exist (e.g. CombBLAS [3] and PEGASUS
+[19]), GraphMat wins out in terms of both productivity and performance as GraphMat is faster and does not expose users to the underlying matrix primitives (unlike CombBLAS and PEGASUS).
+
+尽管存在其他基于矩阵运算的图框架（例如CombBLAS [3]和PEGASUS）[19]），GraphMat在生产力和性能两方面均胜出，因为GraphMat速度更快，并且不会将用户暴露于底层矩阵基元（与CombBLAS和PEGASUS不同）。
+
+We have been able to write multiple graph algorithms in GraphMat with the same effort as other vertex programming frameworks. Our contributions are as follows:
+
+我们已经能够使用与其他顶点编程框架相同的工作量在GraphMat中编写多个图形算法。 我们的贡献如下：
+
+1. GraphMat is the first multi-core optimized vertex programming model to achieve within 1.2X of native, hand-coded, optimized code on a variety of different graph algorithms.
+
+   GraphMat是第一个多核优化的顶点编程模型，可在各种不同的图形算法的本地手动编码优化代码的1.2倍以内实现。
+
+   GraphMat is 5-7X faster than GraphLab [5] & CombBLAS and 1.1X faster than Galois [4] on a single node. 
+
+   在单个节点上，GraphMat比GraphLab [5]和CombBLAS快5-7倍，比Galois [4]快1.1倍。
+
+   It also matches the performance of MapGraph [15], a recent GPU-based graph framework running on a contemporary GPU.
+
+   它也与MapGraph [15]的性能相匹配，这是最近在当代GPU上运行的基于GPU的图形框架。
+
+2. GraphMat achieves good multicore scalability, getting a 13-15X speedup over a single threaded implementation on 24 cores. 
+
+   GraphMat实现了良好的多核可扩展性，通过24核上的单线程实现获得13-15倍的加速比。
+
+   In comparison, GraphLab, CombBLAS, and Galois scale by only 2-12X over their corresponding single threaded implementations.
+
+   相比之下，GraphLab，CombBLAS和Galois仅比其相应的单线程实现缩小了2-12倍。
+
+3. GraphMat is productive for both framework users and developers. 
+
+   GraphMat对于框架用户和开发人员都很有成效。
+
+   Users do not have to learn a new programming paradigm(most are familiar with vertex programming), where as backend developers have fewer primitives to optimize as it is based on Sparse matrix algebra, which is a well-studied operation in High Performance Computing (HPC) [35].
+
+   用户不需要学习新的编程范例（大部分人都熟悉顶点编程），后端开发人员基于稀疏矩阵代数进行优化的基元更少，因为它是高性能计算（HPC）中深入研究的操作 ）[35]。
+
+Matrices are fast becoming one of the key data structures for databases, with systems such as SciDB [6] and other array stores becoming more popular. 
+
+矩阵正在迅速成为数据库的关键数据结构之一，诸如SciDB [6]和其他数组商店等系统越来越受欢迎。
+
+Our approach to graph analytics can take advantage of these developments, letting us deal with graphs as special cases of sparse matrices. 
+
+我们的图分析方法可以利用这些发展，让我们将图作为稀疏矩阵的特例处理。
+
+Such systems offer transactional support, concurrency control, fault tolerance etc. 
+
+这样的系统提供事务支持，并发控制，容错等。
+
+while still maintaining a matrix abstraction. We offer a path for array processing systems to support graph analytics through popular vertex programming frontends.
+
+同时仍然保持矩阵抽象。 我们为阵列处理系统提供了一条途径，通过流行的顶点编程前端支持图形分析。
+
+Basing graph analytics engines on generalized sparse matrix vector multiplication (SPMV) has other benefits as well. 
+
+基于广义稀疏矩阵向量乘法（SPMV）的图分析引擎也具有其他优点。
+
+We can leverage decades of research on techniques to optimize sparse linear algebra in the High Performance Computing world. 
+
+我们可以利用数十年的技术研究来优化高性能计算领域的稀疏线性代数。
+
+Sparse linear algebra provides a bridge between Big Data graph analytics and High Performance Computing. 
+
+稀疏线性代数提供了大数据图形分析和高性能计算之间的桥梁。
+
+Other efforts like GraphBLAS [23] are also part of this growing effort to leverage lessons learned from HPC to help big data.
+
+像GraphBLAS [23]这样的其他工作也是这项不断增长的努力的一部分，这些努力将HPC的经验教训用于帮助大数据。
+
+The rest of the paper is organized as follows. 
+
+本文的其余部分安排如下。
+
+Section 2 provides motivation for GraphMat and compares it to other graph frame-works. 
+
+第2部分为GraphMat提供了动机，并将其与其他图形框架进行了比较。
+
+Section 3 discusses the graph algorithms used in the paper. 
+
+第3节讨论了本文中使用的图算法。
+
+Section 4 describes the GraphMat methodology in detail. 
+
+第4节详细介绍了GraphMat方法。
+
+Section 5 gives details of the results of our experiments with GraphMat while Section 6 concludes the paper.
+
+第5部分详细介绍了我们用GraphMat进行实验的结果，第6部分结束了本文。
