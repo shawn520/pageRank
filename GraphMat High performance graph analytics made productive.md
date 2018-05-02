@@ -175,3 +175,86 @@ Section 4 describes the GraphMat methodology in detail.
 Section 5 gives details of the results of our experiments with GraphMat while Section 6 concludes the paper.
 
 第5部分详细介绍了我们用GraphMat进行实验的结果，第6部分结束了本文。
+
+## 2. MOTIVATION AND RELATED WORK 动机和相关工作
+
+Graph analytics frameworks come with a variety of different programming models. 
+
+图分析框架带有各种不同的编程模型。
+
+Some common ones are vertex programming(“think like a vertex”), matrix operations (“graphs are sparse matrices”), task models(“vertex/edge updates can be modeled as tasks”),declarative programming (“graph operations can be written as data-log programs”), and domain-specific languages (“graph processing needs its own language”). 
+
+一些常见的是顶点编程（“像一个顶点思考”），矩阵运算（“图形是稀疏矩阵”），任务模型（“顶点/边缘更新可以建模为任务”），声明式编程（“图形操作可以 写成数据日志程序“）和特定于领域的语言（”图形处理需要它自己的语言“）。
+
+Of all these models, vertex programming has been quite popular due to ease of use and the wide variety of different frameworks supporting it [28].
+
+在所有这些模型中，由于易用性和支持它的各种不同框架，顶点编程已经非常流行[28]。
+
+## 3. ALGORITHMS 算法
+
+To showcase the performance and productivity of GraphMat, we picked five different algorithms from a diverse set of applications, including machine learning, graph traversal and graph statistics. 
+
+为了展示GraphMat的性能和生产力，我们从多种应用中选择了五种不同的算法，包括机器学习，图形遍历和图形统计。
+
+Our choice covers a wide range of varying functionality (e.g.traversal or statistics), data per vertex, amount of communication,iterative vs. non iterative etc. 
+
+我们的选择涵盖了各种各样的功能（例如，遍历或统计），每个顶点的数据，通信量，迭代与非迭代等。
+
+We give a brief summary of the algorithms below.
+
+我们给出下面算法的简要总结。
+
+###  3.1 Page Rank (PR) 网页排名算法
+
+This is an iterative algorithm used to rank web pages based on some metric (e.g. popularity). 
+
+这是一种迭代算法，用于根据某种度量（例如流行度）对网页进行排名。
+
+The idea is compute the probability that a random walk through the hyperlinks (edges) would end in a particular page (vertex). 
+
+这个想法是计算一个随机遍历超链接（边）将在特定页面（顶点）中结束的概率。
+
+The algorithm iteratively updates the rank of each vertex according to the following equation:
+
+该算法根据以下等式迭代地更新每个顶点的等级：
+$$
+PR^{t+1}(v) = r + (1-r) * \sum_{u|(u,v) \in E)}\frac{PR^t(u)}{degree(u)}
+$$
+where PR t (v) denotes the page rank of vertex v at iteration t,E is the set of edges in a directed graph, and r is the probability of random surfing. The initial ranks are set to 1.0.
+
+其中PR t（v）表示迭代t处顶点v的页面排名，E是有向图中的边集，r是概率随机冲浪。 初始等级设置为1.0。
+
+### 3.2 Breadth First Search (BFS) 广度优先搜索算法
+
+This is a very popular graph search algorithm, which is also used as the kernel by the Graph500
+benchmark [24]. 
+
+这是一种非常流行的图形搜索算法，它也被Graph500用作内核基准[24]。
+
+The algorithm begins at a given vertex (called root)and iteratively explores all connected vertices of an undirected and unweighted graph. 
+
+该算法从给定顶点（称为根）开始，并迭代地探索无向图和未加权图的所有连接顶点。
+
+The idea is to assign a distance to each vertex, where the distance represents the minimum number of edges needed to be traversed to reach the vertex from the root. 
+
+这个想法是给每个顶点分配一个距离，其中距离表示从根到达顶点需要遍历的最小边数。
+
+Initially, the distance of the root is set to 0 and it is marked active. The other distances are set to infinity. 
+
+最初，根的距离设置为0，并且它被标记为活动。其他距离设置为无穷大。 
+
+At iteration t, each vertex adjacent to an active vertex computes the following:
+
+迭代t时，与活动顶点相邻的每个顶点计算以下内容：
+$$
+Distance(v) = min(Distance(v),t + 1)
+$$
+If the update leads to a change in distance (from infinity to t+1),then the vertex becomes active for the next iteration.
+
+如果更新导致距离（从无穷远到t + 1）的变化，则顶点在下一次迭代中变为活动状态。
+
+## 4. GRAPHMAT 图矩阵
+
+## 5. RESULTS 实验结果
+
+## 6. CONCLUSION AND FUTURE WORK 结论与后续工作
