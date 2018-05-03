@@ -377,6 +377,140 @@ We now discuss the implementation of GraphMat and its opti-mizations in the next
 
 ## 4. GRAPHMAT 图矩阵
 
+GraphMat is based on the idea that graph analytics via vertex programming can be performed through a backend that supports only sparse matrix operations. 
+
+GraphMat是基于这样的思想，即通过顶点编程进行图分析可以通过仅支持稀疏矩阵操作的后端执行。
+
+GraphMat takes graph algorithms written as vertex programs and performs generalized sparse matrix vector multiplication on them (iteratively in many cases). 
+
+GraphMat将图形算法写成顶点程序，并对它们执行广义稀疏矩阵向量乘法（在许多情况下迭代）。
+
+This is possible as edge traversals from a set of vertices can be written as sparse matrix-sparse vector multiplication routines on the graph adjacency matrix (or its transpose). 
+
+这是可能的，因为来自一组顶点的边缘遍历可以写成图形邻接矩阵（或其转置）上的稀疏矩阵 - 稀疏矢量乘法例程。
+
+To illustrate this idea, a simple example of calculating in-degree is shown in Figure 1. 
+
+为了验证这个想法，图1显示了一个计算入度的简单例子。
+
+Multiplying the transpose of the graph adjacency matrix (unweighted graph)with a vector of all ones produces a vector of vertex in-degrees. 
+
+将图邻接矩阵（未加权图）的转置与所有1的矢量相乘产生一个顶角度向量。
+
+To get the out-degrees, one can multiply the adjacency matrix with a vector of all ones.
+
+为了得到出度，可以将邻接矩阵乘以所有1的向量。
+
+### 4.1 Mapping Vertex Programs to Generalized SPMV 顶点程序的广义映射
+
+The high-level scheme for converting vertex programs to sparse matrix programs is shown in Figure 2. 
+
+图2显示了将顶点程序转换为稀疏矩阵程序的高级方案。
+
+We observe that while vertex programs can have slightly different semantics, they are all equivalent in terms of expressibility. 
+
+我们观察到尽管顶点程序可以有略微不同的语义，但它们在可表达性方面都是等价的。
+
+Our vertex programming model is similar to that of Giraph [1].
+
+我们的顶点编程模型与Giraph [1]类似。
+
+### 4.2 Generalized SPMV 广义SPMV
+
+### 4.3 Overall framework 总体框架
+
+### 4.4 Data structures 数据结构
+
+We describe the sparse matrix and sparse vector data structures in this section.
+
+我们在本节中描述稀疏矩阵和稀疏矢量数据结构。
+
+#### 4.4.1 Sparse Matrix 稀疏矩阵
+
+We represent the sparse matrix in the Doubly Compressed Sparse Column (DCSC) format [9] which can store very large sparse matrices efficiently. 
+
+我们用双压缩稀疏列（DCSC）格式[9]来表示稀疏矩阵，它可以有效地存储非常大的稀疏矩阵。
+
+It primarily uses four arrays to store a given matrix as briefly explained here: 
+
+它主要使用四个数组来存储给定的矩阵，这里简要解释一下：
+
+one array to store the column indices of the columns which have at-least one non-zero element, two arrays storing the row indices (where there are non-zero elements)corresponding to each of the above column indices and the non-zero values themselves, and another array to point where the row-indices corresponding to a given column index begin in the above array (allowing access to any non-zero element at a given column index and a row index if it is present). 
+
+一个数组存储具有至少一个非零元素的列的列索引，两个数组存储与上述列索引中的每一个相对应的行索引（其中存在非零元素）和非零值 本身和另一个数组，以指向与给定列索引相对应的行索引开始于上述数组中（允许访问给定列索引处的任何非零元素和行索引（如果存在））。
+
+The format also allows an optional array to index the column indices with non-zero elements,which we have not used. 
+
+该格式还允许可选数组使用非零元素索引列索引，这是我们尚未使用的。
+
+For more details and examples, please see [9]. The DCSC format has been used effectively in parallel algorithms for problems such as Generalized sparse matrix-matrix multiplication (SpGEMM) [10], and is part of the Combinatorial BLAS (CombBLAS) library [11]. 
+
+有关更多详细信息和示例，请参见[9]。 DCSC格式已被有效地用于并行算法中，例如广义稀疏矩阵 - 矩阵乘法（SpGEMM）[10]，并且是组合BLAS（CombBLAS）库[11]的一部分。
+
+The matrix is partitioned in a1-D fashion (along rows), and each partition is stored as an independent DCSC structure.
+
+矩阵以1-D方式（沿着行）分区，每个分区作为独立的DCSC结构存储。
+
+#### 4.4.2 Sparse Vector 稀疏向量
+
+Sparse Vectors can be implemented in many ways. Two goodways of storing sparse vectors are as follows: 
+
+稀疏矢量可以用很多方式实现。 存储稀疏向量的两个好处如下：
+
+(1) A variable sizedarray of sorted (index, value) tuples 
+
+（1）一个可变大小的排序（索引，值）元组阵列
+
+(2) A bitvector for storing validindices and a constant (number of vertices) sized array with valuesstored only at the valid indices. 
+
+（2）用于存储有效指令的位向量和仅在有效索引处存储值的常量（顶点数）大小的数组。
+
+Of these, the latter option pro-vides better performance across all algorithms and graphs and so isthe only option considered for the rest of the paper. 
+
+其中，后一种方法在所有算法和图表中提供更好的性能，因此是本文其余部分考虑的唯一选项。
+
+In the SPMVroutine in Algorithm 1, line 4 becomes faster due to use of thebitvector. 
+
+在算法1的SPMV例程中，由于使用了位向量，第4行变得更快。
+
+Since the bitvector can also be shared among multiplethreads and can be cached effectively, it also helps in improvingparallel scalability. 
+
+由于位向量也可以在多线程之间共享，并且可以有效地进行缓存，因此它还有助于提高并行可伸缩性。
+
+The performance gain from this bitvector use ispresented in Section 5.
+
+第5节介绍了该位向量使用的性能增益。
+
+### 4.5 Optimizations 优化
+
+Some of the optimizations performed to improve the performance of GraphMat are described in this section. 
+
+本节介绍了为提高GraphMat的性能而执行的一些优化。
+
+The most important op-timizations improve the performance of the SPMV routine as it ac-counts for most of the runtime.
+
+最重要的操作可以提高SPMV例程的性能，因为它可以用于大部分运行时间。
+
+1. Cache optimizations such as the use of bitvectors for storingsparse vectors improve performance.
+
+   缓存优化（比如使用位向量来存储缓存向量可以提高性能）。
+
+2. Since the generalized SPMV operations(P ROCESS M ESSAGE and R EDUCE ) are user-defined, using the compiler option to perform inter-procedural optimizations (-ipo) is essential.
+
+   由于广义的SPMV操作（PROCESS MESSAGE和REDUCE）是用户定义的，使用编译器选项执行程序间优化（-ipo）是至关重要的。
+
+3. Parallelization of SPMV among multiple cores in the system increases processing speed. Each partition of the matrix is processed by a different thread.
+
+   系统中多个核心之间的SPMV并行化提高处理速度。 矩阵的每个分区是由不同的线程处理。
+
+4. Load balancing among threads can be improved through bet-ter partitioning of the adjacency matrix. We partition the ma-trix into many more partitions than number of threads (typi-cally, 8 partitions per thread) along with dynamic schedulingto distribute the SPMV load among threads better. Withoutthis load balancing, the number of graph partitions wouldequal the number of threads.
+
+   通过邻接矩阵的最佳划分可以改善线程之间的负载平衡。 我们将主成分划分为比线程数更多的分区（通常每个线程有8个分区）以及动态调度，以更好地分配SPMV负载。 如果没有这种负载平衡，图形分区的数量就会等于线程的数量。
+
+We now discuss the experimental setup, datasets used and the results of our comparison to other graph frameworks.
+
+我们现在讨论实验设置，使用的数据集和我们与其他图形框架的比较结果。
+
 ## 5. RESULTS 实验结果
 
 ## 6. CONCLUSION AND FUTURE WORK 结论与后续工作
